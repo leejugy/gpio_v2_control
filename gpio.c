@@ -102,7 +102,10 @@ static int set_gpio_value(GPIO_NAME gpio_name, GPIO_VALUES gpio_set)
     gpio_val.bits = gpio_set; // 1bit만 설정
     gpio_val.mask = 1;        // 1비트 마스크, 최하위 비트 하나만 씀을 의미
 
+    sem_wait(&gpio_sem);
     ret = ioctl(req_fd[gpio_name], GPIO_V2_LINE_SET_VALUES_IOCTL, &gpio_val);
+    sem_post(&gpio_sem);
+    
     if (ret < 0)
     {
         perror("fail to get ioctl");
@@ -121,7 +124,9 @@ static int get_gpio_value(GPIO_NAME gpio_name, GPIO_VALUES *gpio_get)
 
     gpio_val.mask = 0x01; // 1비트 마스크, 최하위 비트 하나만 씀을 의미
 
+    sem_wait(&gpio_sem);
     ret = ioctl(req_fd[gpio_name], GPIO_V2_LINE_GET_VALUES_IOCTL, &gpio_val);
+    sem_post(&gpio_sem);
     if (ret < 0)
     {
         perror("fail to get ioctl");
